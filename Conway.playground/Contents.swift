@@ -2,17 +2,30 @@ import UIKit
 import XCTest
 
 class Board {
-    var board: [[Bool]] = Array(repeating: Array(repeating: false, count: 10), count: 10)
+    let boardSize = 10
+    var board: [[Bool]] = []
+    
+    init() {
+        board = Array(repeating: Array(repeating: false, count: boardSize), count: boardSize)
+    }
+    
     func getBoard() -> [[Bool]] {
         return board
     }
     
     func populateBoard(population: Int) {
-        for y in 0...board.count-1 {
-            for x in 0...board.count-1 {
-                if (board[y][x] == false) {
-                    board[y][x] = true
-                }
+        var populatedCoordinates: [Set<Int>] = []
+        
+        var populationWanted = 0
+        while (populationWanted < population) {
+            let randomY = Int.random(in: 0..<boardSize)
+            let randomX = Int.random(in: 0..<boardSize)
+            let coordinates: Set = [randomY, randomX]
+            
+            if (!populatedCoordinates.contains(coordinates)) {
+                self.board[randomY][randomX] = true
+                populatedCoordinates.append(coordinates)
+                populationWanted += 1
             }
         }
     }
@@ -33,9 +46,22 @@ class testValidBoard: XCTestCase {
     
     func testBoardPopulation() {
         let testBoard = Board()
+        var testBoardArray: [[Bool]] = testBoard.getBoard()
         
-        testBoard.populateBoard(population: 10)
+        let populationWanted = 10
+        testBoard.populateBoard(population: populationWanted)
+        testBoardArray = testBoard.getBoard()
+
+        var populationFound = 0
+        for column in testBoardArray {
+            for row in column {
+                if (row == true) {
+                    populationFound += 1
+                }
+            }
+        }
         
+        XCTAssertEqual(populationWanted, populationFound)
     }
 }
 
